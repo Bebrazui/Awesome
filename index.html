@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Nova Workspace TMA</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="telegram-web-app.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- SVG Sprite Definition for Solid / Filled Icons (NO EMOJIS, NO WIREFRAMES) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <defs>
+      <!-- Heroicons 24 Solid: Bolt -->
+      <symbol id="icon-bolt" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: ChevronDown -->
+      <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: ChevronRight -->
+      <symbol id="icon-chevron-right" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: Checkmark -->
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: XMark / Close -->
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: ArrowPath (Exchange / Swap) -->
+      <symbol id="icon-arrow-path" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.023.75.75 0 00-.53-.92z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: ArrowsRightLeft (DEX Swap) -->
+      <symbol id="icon-swap" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M15.97 2.47a.75.75 0 011.06 0l4.5 4.5a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 11-1.06-1.06l3.22-3.22H7.5a.75.75 0 010-1.5h11.69l-3.22-3.22a.75.75 0 010-1.06zm-7.94 9a.75.75 0 010 1.06l-3.22 3.22H16.5a.75.75 0 010 1.5H4.81l3.22 3.22a.75.75 0 11-1.06 1.06l-4.5-4.5a.75.75 0 010-1.06l4.5-4.5a.75.75 0 011.06 0z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: PlusCircle -->
+      <symbol id="icon-plus-circle" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Tab 1: Agent Solid Star with Mascot Eyes -->
+      <!-- Heroicons 24 Solid: Sparkles (Tab 1) -->
+      <symbol id="icon-tab-agent" viewBox="0 0 24 24">
+        <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: Squares2X2 (Tab 2) -->
+      <symbol id="icon-tab-explore" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h2.25a3 3 0 013 3v2.25a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm9.75 0a3 3 0 013-3H18a3 3 0 013 3v2.25a3 3 0 01-3 3h-2.25a3 3 0 01-3-3V6zM3 15.75a3 3 0 013-3h2.25a3 3 0 013 3V18a3 3 0 01-3 3H6a3 3 0 01-3-3v-2.25zm9.75 0a3 3 0 013-3H18a3 3 0 013 3V18a3 3 0 01-3 3h-2.25a3 3 0 01-3-3v-2.25z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: CommandLine (Tab 3) -->
+      <symbol id="icon-tab-generate" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M2.25 6A2.25 2.25 0 014.5 3.75h15A2.25 2.25 0 0121.75 6v12A2.25 2.25 0 0119.5 20.25h-15A2.25 2.25 0 012.25 18V6zm3.97 3.47a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 01-1.06-1.06L8.69 13 6.22 10.53a.75.75 0 010-1.06zm4.28 7.28a.75.75 0 000 1.5h5a.75.75 0 000-1.5h-5z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: Cog6Tooth (Tab 4) -->
+      <symbol id="icon-tab-settings" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L8.93 5.61a7.48 7.48 0 00-1.848 1.066L5.34 5.723a1.875 1.875 0 00-2.27.472L1.878 7.93a1.875 1.875 0 00.187 2.31l1.396 1.396a7.57 7.57 0 000 2.133l-1.396 1.396a1.875 1.875 0 00-.187 2.31l1.192 1.735c.54.786 1.603 1.002 2.27.472l1.742-.953a7.48 7.48 0 001.848 1.066l.298 1.793c.151.904.933 1.567 1.85 1.567h2.384c.917 0 1.699-.663 1.85-1.567l.298-1.793a7.48 7.48 0 001.848-1.066l1.742.953c.667.53 1.73.314 2.27-.472l1.192-1.735a1.875 1.875 0 00-.187-2.31l-1.396-1.396c.07-.35.106-.708.106-1.067s-.036-.718-.106-1.067l1.396-1.396a1.875 1.875 0 00.187-2.31l-1.192-1.735a1.875 1.875 0 00-2.27-.472l-1.742.953a7.48 7.48 0 00-1.848-1.066l-.298-1.793A1.875 1.875 0 0013.462 2.25h-2.384zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: User -->
+      <symbol id="icon-user" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: Bell -->
+      <symbol id="icon-bell" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 004.496 0 25.057 25.057 0 01-4.496 0z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: Cloud -->
+      <symbol id="icon-cloud" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M4.5 9.75a6 6 0 0111.573-2.226 3.75 3.75 0 014.177 4.274A4.5 4.5 0 0118 20.25H6.75a5.25 5.25 0 01-2.25-10.5z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: Banknotes -->
+      <symbol id="icon-token" viewBox="0 0 24 24">
+        <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"/><path fill-rule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 14.625v-9.75zM8.25 9.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM18.75 9a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V9.75a.75.75 0 00-.75-.75h-.008zM4.5 9.75A.75.75 0 015.25 9h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V9.75z" clip-rule="evenodd"/>
+      </symbol>
+      <!-- Heroicons 24 Solid: PaperAirplane -->
+      <symbol id="icon-send" viewBox="0 0 24 24">
+        <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-msg">
+    <svg><use href="#icon-check"></use></svg>
+    <span id="toast-text">Действие выполнено</span>
+  </div>
+
+  <div class="app-container">
+    <!-- Action Header Bar -->
+    <header class="action-header">
+      <button id="model-selector-btn" class="model-selector-btn tma-touch">
+        <span id="selected-model-name">TON Mainnet</span>
+        <svg class="chevron-icon"><use href="#icon-chevron-down"></use></svg>
+      </button>
+
+      <button id="pro-btn" class="pro-upgrade-btn tma-touch">
+        <svg class="bolt-icon"><use href="#icon-bolt"></use></svg>
+        <span>Пополнить TON</span>
+      </button>
+    </header>
+
+    <!-- TAB 1: WALLET / VAULT (MAIN) -->
+    <section id="tab-agent-content" class="tab-pane active">
+      <!-- Mascot / Asset Hero -->
+      <div class="hero-section">
+        <div class="mascot-glow-wrapper">
+          <div class="mascot-orb" id="user-avatar-orb" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <svg class="mascot-inner-icon" id="user-avatar-placeholder"><use href="#icon-token"></use></svg>
+            <img id="user-avatar-img" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Avatar" />
+          </div>
+        </div>
+        <h1 class="hero-title" id="user-greeting">Кошелек Сани</h1>
+        <div class="hero-balance-badge" style="gap: 10px; padding: 8px 18px;">
+          <span class="balance-num" style="font-size: 20px;">$ 12,450.80</span>
+          <span style="font-size: 12px; font-weight: 700; color: var(--accent-green); background: rgba(40, 199, 111, 0.15); padding: 2px 8px; border-radius: 9999px;">+14.8%</span>
+        </div>
+        <p class="hero-subtitle">Безопасное хранение и доходность в Telegram</p>
+      </div>
+
+      <!-- Action Prompt Cards -->
+      <div class="section-header">
+        <span>Быстрые действия</span>
+        <a href="#" class="section-header-link" id="action-all-link">Все</a>
+      </div>
+
+      <div class="cards-list">
+        <div class="action-card tma-touch" data-action="staking">
+          <div class="card-action-icon-wrap">
+            <svg class="card-action-icon"><use href="#icon-plus-circle"></use></svg>
+          </div>
+          <div class="card-content">
+            <span class="card-title">Авто-стейкинг TON (8.5% APR)</span>
+            <span class="card-benefit">
+              <svg class="benefit-bolt"><use href="#icon-bolt"></use></svg>
+              <span>приносит +38 TON в месяц</span>
+            </span>
+          </div>
+          <svg class="card-chevron"><use href="#icon-chevron-right"></use></svg>
+        </div>
+
+        <div class="action-card tma-touch" data-action="p2p">
+          <div class="card-action-icon-wrap">
+            <svg class="card-action-icon"><use href="#icon-plus-circle"></use></svg>
+          </div>
+          <div class="card-content">
+            <span class="card-title">Экспресс P2P без комиссии</span>
+            <span class="card-benefit">
+              <svg class="benefit-bolt"><use href="#icon-bolt"></use></svg>
+              <span>экономит $18 на транзакции</span>
+            </span>
+          </div>
+          <svg class="card-chevron"><use href="#icon-chevron-right"></use></svg>
+        </div>
+
+        <div class="action-card tma-touch" data-action="alerts">
+          <div class="card-action-icon-wrap">
+            <svg class="card-action-icon"><use href="#icon-plus-circle"></use></svg>
+          </div>
+          <div class="card-content">
+            <span class="card-title">Сигналы китов и смарт-алерты</span>
+            <span class="card-benefit">
+              <svg class="benefit-bolt"><use href="#icon-bolt"></use></svg>
+              <span>экономит 45 минут анализа</span>
+            </span>
+          </div>
+          <svg class="card-chevron"><use href="#icon-chevron-right"></use></svg>
+        </div>
+
+        <div class="action-card tma-touch" data-action="stars">
+          <div class="card-action-icon-wrap">
+            <svg class="card-action-icon"><use href="#icon-plus-circle"></use></svg>
+          </div>
+          <div class="card-content">
+            <span class="card-title">Кешбэк Telegram Stars</span>
+            <span class="card-benefit">
+              <svg class="benefit-bolt"><use href="#icon-bolt"></use></svg>
+              <span>возврат до 20% Stars</span>
+            </span>
+          </div>
+          <svg class="card-chevron"><use href="#icon-chevron-right"></use></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: EXPLORE / DASHBOARD -->
+    <section id="tab-explore-content" class="tab-pane" style="display: none;">
+      <!-- Arc Progress Widget -->
+      <div class="arc-widget-card">
+        <div class="arc-svg-container">
+          <svg class="arc-svg" viewBox="0 0 190 110">
+            <!-- Background track arc -->
+            <path d="M 25 95 A 70 70 0 0 1 165 95" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
+            <!-- Active progress arc (e.g. 70% filled) -->
+            <path id="arc-progress-path" d="M 25 95 A 70 70 0 0 1 145 42" fill="none" stroke="url(#arcGlowGrad)" stroke-width="12" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="arcGlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0284c7"/>
+                <stop offset="100%" stop-color="#38bdf8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="arc-center-content">
+            <span class="arc-step-number" id="arc-steps-left">3</span>
+            <span class="arc-step-total">из 5 уровней</span>
+          </div>
+        </div>
+        <span class="arc-badge">Лимит Tier-3</span>
+        <h2 class="arc-title">Лимит безопасности Web3</h2>
+        <p class="arc-desc">Подключите облачный бэкап и подтвердите кошелек для расширения лимита до $50,000 / день</p>
+        <button class="arc-cta-btn tma-touch" id="btn-continue-setup">Повысить лимит</button>
+      </div>
+
+      <!-- Quick Action Row -->
+      <div class="quick-actions-row">
+        <div class="quick-action-item tma-touch" data-quick="transfer">
+          <div class="quick-action-icon-box">
+            <svg><use href="#icon-send"></use></svg>
+          </div>
+          <span class="quick-action-label">Перевести</span>
+        </div>
+        <div class="quick-action-item tma-touch" data-quick="deposit">
+          <div class="quick-action-icon-box">
+            <svg><use href="#icon-plus-circle"></use></svg>
+          </div>
+          <span class="quick-action-label">Пополнить</span>
+        </div>
+        <div class="quick-action-item tma-touch" data-quick="withdraw">
+          <div class="quick-action-icon-box">
+            <svg><use href="#icon-bolt"></use></svg>
+          </div>
+          <span class="quick-action-label">Вывести</span>
+        </div>
+        <div class="quick-action-item tma-touch" data-quick="swap">
+          <div class="quick-action-icon-box">
+            <svg><use href="#icon-arrow-path"></use></svg>
+          </div>
+          <span class="quick-action-label">Обменять</span>
+        </div>
+      </div>
+
+      <!-- Promo Carousel Banner -->
+      <div class="promo-banner tma-touch" id="promo-banner-card">
+        <div class="promo-top">
+          <span class="promo-badge">Web3 Pay 2.0</span>
+          <button class="promo-close" id="promo-close-btn">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <h3 class="promo-title">Nexus Pay: Мгновенные переводы без комиссий</h3>
+        <p class="promo-desc">Отправляйте TON и USDT контактам Telegram прямо в чате с кешбэком до 20% в Stars.</p>
+        <div class="promo-dots">
+          <span class="promo-dot active"></span>
+          <span class="promo-dot"></span>
+          <span class="promo-dot"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: DEX SWAP / EXCHANGE -->
+    <section id="tab-generate-content" class="tab-pane" style="display: none;">
+      <div class="generator-card">
+        <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">DEX Обменник Nexus</h2>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">Мгновенный обмен криптоактивов без комиссии сети TON</p>
+
+        <div class="quick-prompts-row">
+          <button class="quick-prompt-pill tma-touch" data-pair="TON_USDT">TON → USDT</button>
+          <button class="quick-prompt-pill tma-touch" data-pair="USDT_TON">USDT → TON</button>
+          <button class="quick-prompt-pill tma-touch" data-pair="TON_NOT">TON → NOT</button>
+          <button class="quick-prompt-pill tma-touch" data-pair="TON_STARS">TON → Stars</button>
+        </div>
+
+        <div style="background: rgba(14, 20, 27, 0.6); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+            <span>Вы отдаете</span>
+            <span>Доступно: <strong style="color: #fff;">150.00 TON</strong></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <input id="swap-input-amount" type="number" value="10" style="background: transparent; border: none; font-size: 24px; font-weight: 700; color: #fff; width: 60%; outline: none;" />
+            <div style="background: #25364a; padding: 6px 12px; border-radius: 9999px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              <span id="swap-from-symbol">TON</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin: -4px 0 6px 0;">
+          <button id="swap-reverse-btn" class="tma-touch" style="background: #1e2a3a; border: 1px solid var(--border-subtle); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--accent-cyan);">
+            <svg style="width: 16px; height: 16px;"><use href="#icon-arrow-path"></use></svg>
+          </button>
+        </div>
+
+        <div style="background: rgba(14, 20, 27, 0.6); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+            <span>Вы получаете</span>
+            <span style="color: var(--accent-green);">Курс: 1 TON ≈ 5.62 USDT</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div id="swap-output-amount" style="font-size: 24px; font-weight: 700; color: #fff;">56.20</div>
+            <div style="background: #25364a; padding: 6px 12px; border-radius: 9999px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              <span id="swap-to-symbol">USDT</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="primary-cta-btn tma-touch" id="generate-btn">
+          <svg><use href="#icon-arrow-path"></use></svg>
+          <span id="swap-btn-label">Обменять TON на USDT</span>
+        </button>
+
+        <div id="generation-output" class="output-box" style="display: none;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--accent-green); text-transform: uppercase; margin-bottom: 6px;">Статус транзакции</div>
+          <div id="output-text"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SETTINGS / PROFILE -->
+    <section id="tab-settings-content" class="tab-pane" style="display: none;">
+      <h2 class="section-header" style="margin-top: 4px;">Безопасность и Сеть</h2>
+      <div class="grouped-list">
+        <div class="group-item tma-touch" data-setting="network">
+          <div class="group-icon-squircle" style="background: linear-gradient(135deg, #0077ff, #00a6ff);">
+            <svg><use href="#icon-tab-agent"></use></svg>
+          </div>
+          <div class="group-item-body">
+            <span class="group-item-title">Сеть блокчейна</span>
+            <span class="group-item-sub">TON Mainnet (Gasless)</span>
+          </div>
+          <div class="group-item-right">
+            <svg class="group-item-chevron"><use href="#icon-chevron-right"></use></svg>
+          </div>
+        </div>
+
+        <div class="group-item">
+          <div class="group-icon-squircle" style="background: #28c76f;">
+            <svg><use href="#icon-bolt"></use></svg>
+          </div>
+          <div class="group-item-body">
+            <span class="group-item-title">FaceID / TouchID</span>
+            <span class="group-item-sub">Биометрия для подтверждения</span>
+          </div>
+          <div class="group-item-right">
+            <label class="toggle-switch">
+              <input type="checkbox" id="digest-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="group-item tma-touch" data-setting="sync">
+          <div class="group-icon-squircle" style="background: #06b6d4;">
+            <svg><use href="#icon-cloud"></use></svg>
+          </div>
+          <div class="group-item-body">
+            <span class="group-item-title">Облачный бэкап ключей</span>
+            <span class="group-item-sub">Telegram Cloud Key Vault</span>
+          </div>
+          <div class="group-item-right">
+            <span class="group-item-status" style="color: var(--accent-green);">Защищено</span>
+            <svg class="group-item-chevron"><use href="#icon-chevron-right"></use></svg>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="section-header">Платежи и Профиль</h2>
+      <div class="grouped-list">
+        <div class="group-item tma-touch" data-setting="profile-info">
+          <div class="group-icon-squircle" id="profile-avatar-squircle" style="background: #3b82f6; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <svg id="profile-avatar-placeholder"><use href="#icon-user"></use></svg>
+            <img id="profile-avatar-img" style="display: none; width: 100%; height: 100%; object-fit: cover;" alt="Avatar" />
+          </div>
+          <div class="group-item-body">
+            <span class="group-item-title" id="profile-name">Владелец хранилища</span>
+            <span class="group-item-sub" id="profile-handle">@telegram_user</span>
+          </div>
+          <div class="group-item-right">
+            <svg class="group-item-chevron"><use href="#icon-chevron-right"></use></svg>
+          </div>
+        </div>
+
+        <div class="group-item tma-touch" data-setting="stars-balance">
+          <div class="group-icon-squircle" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+            <svg><use href="#icon-token"></use></svg>
+          </div>
+          <div class="group-item-body">
+            <span class="group-item-title">Telegram Stars</span>
+            <span class="group-item-sub">Баланс для кешбэка и оплаты</span>
+          </div>
+          <div class="group-item-right">
+            <span class="group-item-status" style="font-weight: 600; color: #f59e0b;">⭐ 1,450</span>
+            <svg class="group-item-chevron"><use href="#icon-chevron-right"></use></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- FLOATING ISLAND PILL BAR (Section 7) -->
+  <nav class="floating-navbar">
+    <button class="nav-tab-btn active tma-touch" data-tab="agent">
+      <svg><use href="#icon-tab-agent"></use></svg>
+      <span class="nav-tab-label">Кошелек</span>
+    </button>
+    <button class="nav-tab-btn tma-touch" data-tab="explore">
+      <svg><use href="#icon-tab-explore"></use></svg>
+      <span class="nav-tab-label">Дашборд</span>
+    </button>
+    <button class="nav-tab-btn tma-touch" data-tab="generate">
+      <svg><use href="#icon-arrow-path"></use></svg>
+      <span class="nav-tab-label">Обмен</span>
+    </button>
+    <button class="nav-tab-btn tma-touch" data-tab="settings">
+      <svg><use href="#icon-tab-settings"></use></svg>
+      <span class="nav-tab-label">Настройки</span>
+    </button>
+  </nav>
+
+  <!-- Network Selector Modal Bottom Sheet -->
+  <div id="model-modal" class="modal-overlay">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <h3 class="sheet-title">Выберите сеть блокчейна</h3>
+      <div class="sheet-option selected tma-touch" data-model="TON Mainnet">
+        <div>
+          <div class="sheet-option-title">TON Mainnet</div>
+          <div class="sheet-option-desc">Основная сеть The Open Network (Gasless транзакции)</div>
+        </div>
+        <svg class="sheet-check-icon"><use href="#icon-check"></use></svg>
+      </div>
+      <div class="sheet-option tma-touch" data-model="TON Testnet">
+        <div>
+          <div class="sheet-option-title">TON Testnet</div>
+          <div class="sheet-option-desc">Тестовая сеть для проверки смарт-контрактов</div>
+        </div>
+        <svg class="sheet-check-icon"><use href="#icon-check"></use></svg>
+      </div>
+      <div class="sheet-option tma-touch" data-model="Arbitrum One">
+        <div>
+          <div class="sheet-option-title">Arbitrum One</div>
+          <div class="sheet-option-desc">Ethereum Layer-2 с мгновенным мостом в TON</div>
+        </div>
+        <svg class="sheet-check-icon"><use href="#icon-check"></use></svg>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
