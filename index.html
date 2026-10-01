@@ -3,217 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Aether — Minimalist Solar VPN</title>
+  <title>Aether — Личный прокси-узел</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Heroicons 24 Solid SVG Sprite -->
+  <!-- Heroicons 24 Solid Sprite -->
   <svg style="display: none;">
     <defs>
-      <!-- ShieldCheck -->
       <symbol id="icon-shield" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.094 8.016a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"/>
       </symbol>
-      <!-- Power -->
-      <symbol id="icon-power" viewBox="0 0 24 24">
-        <path fill-rule="evenodd" d="M12 2.25a.75.75 0 01.75.75v7.5a.75.75 0 01-1.5 0v-7.5A.75.75 0 0112 2.25zM6.166 5.106a.75.75 0 01.928.536 9 9 0 109.812 0 .75.75 0 01.4-1.446 10.5 10.5 0 11-11.676 0 .75.75 0 01.536-.928z" clip-rule="evenodd"/>
-      </symbol>
-      <!-- Globe -->
       <symbol id="icon-globe" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M12 2.25c5.385 0 9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12 6.615 2.25 12 2.25zM12.75 6a7.5 7.5 0 00-7.398 6.25h14.796A7.5 7.5 0 0012.75 6zm-7.398 7.75a7.5 7.5 0 007.398 6.25 7.5 7.5 0 007.398-6.25H5.352z" clip-rule="evenodd"/>
       </symbol>
-      <!-- Chart -->
       <symbol id="icon-chart" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M3 3a1.5 1.5 0 00-1.5 1.5v15A1.5 1.5 0 003 21h18a1.5 1.5 0 001.5-1.5V4.5A1.5 1.5 0 0021 3H3zm3.75 13.5a.75.75 0 01-.75-.75v-6a.75.75 0 011.5 0v6a.75.75 0 01-.75.75zm4.5 0a.75.75 0 01-.75-.75V8.25a.75.75 0 011.5 0v7.5a.75.75 0 01-.75.75zm4.5 0a.75.75 0 01-.75-.75v-9a.75.75 0 011.5 0v9a.75.75 0 01-.75.75zm4.5 0a.75.75 0 01-.75-.75v-4.5a.75.75 0 011.5 0v4.5a.75.75 0 01-.75.75z" clip-rule="evenodd"/>
       </symbol>
-      <!-- Cog -->
       <symbol id="icon-cog" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L8.93 5.61a7.48 7.48 0 00-1.848 1.066L5.34 5.723a1.875 1.875 0 00-2.27.472L1.878 7.93a1.875 1.875 0 00.187 2.31l1.396 1.396a7.57 7.57 0 000 2.133l-1.396 1.396a1.875 1.875 0 00-.187 2.31l1.192 1.735c.54.786 1.603 1.002 2.27.472l1.742-.953a7.48 7.48 0 001.848 1.066l.298 1.793c.151.904.933 1.567 1.85 1.567h2.384c.917 0 1.699-.663 1.85-1.567l.298-1.793a7.48 7.48 0 001.848-1.066l1.742.953c.667.53 1.73.314 2.27-.472l1.192-1.735a1.875 1.875 0 00-.187-2.31l-1.396-1.396c.07-.35.106-.708.106-1.067s-.036-.718-.106-1.067l1.396-1.396a1.875 1.875 0 00.187-2.31l-1.192-1.735a1.875 1.875 0 00-2.27-.472l-1.742.953a7.48 7.48 0 00-1.848-1.066l-.298-1.793A1.875 1.875 0 0013.462 2.25h-2.384zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" clip-rule="evenodd"/>
       </symbol>
-      <!-- Heroicons 24 Solid: ClipboardDocument -->
       <symbol id="icon-copy" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M10.5 3A1.5 1.5 0 009 4.5h6A1.5 1.5 0 0013.5 3h-3zm-2.25 1.5A3 3 0 0110.5 1.5h3a3 3 0 012.25 1.5H18a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3v-12a3 3 0 013-3h2.25zm.75 3a.75.75 0 000 1.5h6a.75.75 0 000-1.5H9zm0 3.75a.75.75 0 000 1.5h6a.75.75 0 000-1.5H9zm0 3.75a.75.75 0 000 1.5h3.75a.75.75 0 000-1.5H9z" clip-rule="evenodd"/>
       </symbol>
-      <!-- ChevronRight -->
-      <symbol id="icon-chevron" viewBox="0 0 24 24">
-        <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clip-rule="evenodd"/>
-      </symbol>
-      <!-- Check -->
       <symbol id="icon-check" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd"/>
+      </symbol>
+      <symbol id="icon-chevron" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clip-rule="evenodd"/>
       </symbol>
     </defs>
   </svg>
 
-  <!-- Toast -->
+  <!-- Clean Toast -->
   <div id="toast" class="toast-msg">
     <svg><use href="#icon-check"></use></svg>
-    <span id="toast-text">Конфигурация скопирована</span>
+    <span id="toast-text">Ключ скопирован</span>
   </div>
 
-  <div class="app-container">
-    <!-- Minimalist Header -->
-    <header class="minimal-header">
-      <div class="profile-chip tma-touch">
-        <img id="nav-user-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar" class="avatar-mini">
-        <span class="user-greeting" id="user-display-name">Саня</span>
+  <div class="app-frame">
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="user-block">
+        <img id="nav-user-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar" class="avatar-img">
+        <div class="user-text">
+          <span class="user-name" id="user-display-name">Саня</span>
+          <span class="node-status-caption" id="header-status">Подключено</span>
+        </div>
       </div>
-
-      <div class="live-pill tma-touch" id="ping-refresh-btn">
-        <span class="pulse-orange-dot"></span>
-        <span id="current-ping">14 ms</span>
+      <div class="ping-readout tma-touch" id="ping-refresh-btn">
+        <span class="ping-number" id="current-ping">14</span>
+        <span class="ping-unit">мс</span>
       </div>
     </header>
 
-    <!-- TAB 1: MAIN SOLAR HUB (Pure Minimalism) -->
+    <!-- TAB 1: INSTRUMENT CONSOLE -->
     <main id="tab-connect-content" class="tab-pane active">
-      <!-- Big Tactile Solar Ring -->
-      <div class="hero-solar-wrap">
-        <button id="power-toggle-btn" class="solar-dial active tma-touch" aria-label="Toggle VPN">
-          <div class="solar-ring-outer">
-            <div class="solar-ring-inner">
-              <svg class="solar-icon"><use href="#icon-power"></use></svg>
-              <span class="dial-status-caption" id="dial-caption">ON</span>
+      <!-- Hardware Instrument Switch Block -->
+      <section class="instrument-console">
+        <div class="instrument-meta">
+          <span class="console-label">Состояние узла</span>
+          <h1 class="console-title" id="console-title">Защита активна</h1>
+          <p class="console-sub" id="console-sub">Трафик направлен через Стокгольм</p>
+        </div>
+
+        <!-- Tactile Rocker Toggle Switch -->
+        <div class="toggle-instrument-wrap">
+          <button id="power-toggle-btn" class="hardware-switch active tma-touch" aria-label="Переключить соединение">
+            <div class="switch-slot">
+              <div class="switch-knob">
+                <span class="knob-label" id="knob-text">ON</span>
+              </div>
             </div>
+          </button>
+        </div>
+
+        <div class="instrument-footer-metrics">
+          <div class="spec-col">
+            <span class="spec-label">Протокол</span>
+            <span class="spec-value">VLESS Reality</span>
           </div>
-        </button>
-
-        <div class="hero-info-block">
-          <h1 class="hero-state-title" id="hero-state-title">Защищено</h1>
-          <p class="hero-state-sub" id="hero-state-sub">VLESS Reality • Стокгольм, Швеция</p>
-        </div>
-      </div>
-
-      <!-- Single Primary Action Card: Selected Node -->
-      <div class="minimal-card tma-touch" id="select-node-card">
-        <div class="card-left">
-          <span class="flag-icon">🇸🇪</span>
-          <div class="card-text">
-            <span class="card-name" id="selected-node-name">Швеция • Стокгольм</span>
-            <span class="card-meta">10 Gbps • Быстрый узел</span>
+          <div class="spec-col">
+            <span class="spec-label">IP адрес</span>
+            <span class="spec-value" id="current-ip">185.220.101.45</span>
+          </div>
+          <div class="spec-col">
+            <span class="spec-label">Канал</span>
+            <span class="spec-value">10 Гбит/с</span>
           </div>
         </div>
-        <div class="card-right">
-          <span class="badge-ping" id="selected-node-ping">14 ms</span>
-          <svg class="chevron-mini"><use href="#icon-chevron"></use></svg>
-        </div>
-      </div>
+      </section>
 
-      <!-- Single Minimal Action Button: Copy Config -->
-      <button class="action-btn-warm tma-touch" id="btn-copy-vless">
-        <svg class="btn-svg"><use href="#icon-copy"></use></svg>
-        <span>Скопировать VLESS для Happ / V2Ray</span>
+      <!-- Primary Action CTA -->
+      <button class="btn-copy-cta tma-touch" id="btn-copy-vless">
+        <svg class="btn-icon"><use href="#icon-copy"></use></svg>
+        <span>Скопировать ключ для Happ / V2Ray</span>
       </button>
+
+      <!-- Active Server Row -->
+      <div class="server-active-card tma-touch" id="active-server-card">
+        <div class="server-card-info">
+          <span class="server-flag">🇸🇪</span>
+          <div>
+            <span class="server-card-title" id="selected-node-name">Швеция, Стокгольм</span>
+            <span class="server-card-sub">Основной сервер с минимальной задержкой</span>
+          </div>
+        </div>
+        <div class="server-card-action">
+          <span class="server-card-ping" id="selected-node-ping">14 мс</span>
+          <svg class="chevron-icon"><use href="#icon-chevron"></use></svg>
+        </div>
+      </div>
     </main>
 
-    <!-- TAB 2: SERVERS (Clean Minimal List) -->
+    <!-- TAB 2: SERVERS LIST -->
     <section id="tab-servers-content" class="tab-pane" style="display: none;">
-      <h2 class="view-heading">Серверы</h2>
-      <div class="nodes-minimal-list">
-        <div class="node-item selected tma-touch" data-node="se" data-name="Швеция • Стокгольм" data-ping="14 ms">
-          <div class="node-item-left">
-            <span class="node-flag">🇸🇪</span>
-            <span class="node-label">Стокгольм, Швеция</span>
+      <div class="section-title-wrap">
+        <h2 class="page-title">Локации серверов</h2>
+        <p class="page-desc">Все узлы настроены с маскировкой трафика от блокировок провайдера</p>
+      </div>
+
+      <div class="server-table">
+        <div class="server-row selected tma-touch" data-node="se" data-name="Швеция, Стокгольм" data-ping="14 мс" data-ip="185.220.101.45">
+          <div class="server-main">
+            <span class="server-flag">🇸🇪</span>
+            <div>
+              <span class="server-city">Стокгольм, Швеция</span>
+              <span class="server-detail">Выделенный порт 10 Gbps</span>
+            </div>
           </div>
-          <span class="node-tag">14 ms</span>
+          <span class="server-badge">14 мс</span>
         </div>
 
-        <div class="node-item tma-touch" data-node="fi" data-name="Финляндия • Хельсинки" data-ping="19 ms">
-          <div class="node-item-left">
-            <span class="node-flag">🇫🇮</span>
-            <span class="node-label">Хельсинки, Финляндия</span>
+        <div class="server-row tma-touch" data-node="fi" data-name="Финляндия, Хельсинки" data-ping="19 мс" data-ip="194.87.68.12">
+          <div class="server-main">
+            <span class="server-flag">🇫🇮</span>
+            <div>
+              <span class="server-city">Хельсинки, Финляндия</span>
+              <span class="server-detail">Прямой пиринг</span>
+            </div>
           </div>
-          <span class="node-tag">19 ms</span>
+          <span class="server-badge">19 мс</span>
         </div>
 
-        <div class="node-item tma-touch" data-node="de" data-name="Германия • Франкфурт" data-ping="24 ms">
-          <div class="node-item-left">
-            <span class="node-flag">🇩🇪</span>
-            <span class="node-label">Франкфурт, Германия</span>
+        <div class="server-row tma-touch" data-node="de" data-name="Германия, Франкфурт" data-ping="24 мс" data-ip="142.132.204.81">
+          <div class="server-main">
+            <span class="server-flag">🇩🇪</span>
+            <div>
+              <span class="server-city">Франкфурт, Германия</span>
+              <span class="server-detail">Европейский хаб DE-CIX</span>
+            </div>
           </div>
-          <span class="node-tag">24 ms</span>
+          <span class="server-badge">24 мс</span>
         </div>
 
-        <div class="node-item tma-touch" data-node="nl" data-name="Нидерланды • Амстердам" data-ping="28 ms">
-          <div class="node-item-left">
-            <span class="node-flag">🇳🇱</span>
-            <span class="node-label">Амстердам, Нидерланды</span>
+        <div class="server-row tma-touch" data-node="nl" data-name="Нидерланды, Амстердам" data-ping="28 мс" data-ip="45.142.215.30">
+          <div class="server-main">
+            <span class="server-flag">🇳🇱</span>
+            <div>
+              <span class="server-city">Амстердам, Нидерланды</span>
+              <span class="server-detail">Оптимизировано для медиа</span>
+            </div>
           </div>
-          <span class="node-tag">28 ms</span>
+          <span class="server-badge">28 мс</span>
         </div>
       </div>
     </section>
 
-    <!-- TAB 3: TRAFFIC (Airy Minimal Stats) -->
+    <!-- TAB 3: TRAFFIC & DEVICES -->
     <section id="tab-traffic-content" class="tab-pane" style="display: none;">
-      <h2 class="view-heading">Трафик</h2>
-      
-      <div class="traffic-minimal-box">
-        <span class="traffic-num">48.2 <small>/ 100 GB</small></span>
-        <div class="bar-track">
-          <div class="bar-orange-fill" style="width: 48%;"></div>
-        </div>
-        <span class="traffic-reset-hint">Сброс через 14 дней</span>
+      <div class="section-title-wrap">
+        <h2 class="page-title">Использование трафика</h2>
+        <p class="page-desc">Скорость не ограничивается на всем периоде действия</p>
       </div>
 
-      <div class="device-minimal-list">
-        <div class="device-item">
-          <span>iPhone 15 Pro</span>
-          <span class="device-dot"></span>
+      <div class="traffic-box">
+        <div class="traffic-value-row">
+          <span class="traffic-big">48.2</span>
+          <span class="traffic-limit">из 100 ГБ</span>
         </div>
-        <div class="device-item">
-          <span>PC Windows (Happ)</span>
-          <span class="device-dot"></span>
+        <div class="meter-track">
+          <div class="meter-bar" style="width: 48%;"></div>
+        </div>
+        <span class="meter-caption">Период обновится через 14 дней</span>
+      </div>
+
+      <div class="devices-table">
+        <div class="device-cell">
+          <span class="device-title">iPhone 15 Pro (Telegram)</span>
+          <span class="device-live-tag">Активен</span>
+        </div>
+        <div class="device-cell">
+          <span class="device-title">PC Windows (Happ Proxy)</span>
+          <span class="device-live-tag">127.0.0.1:10808</span>
         </div>
       </div>
     </section>
 
-    <!-- TAB 4: OPTIONS (Clean Toggles) -->
+    <!-- TAB 4: OPTIONS -->
     <section id="tab-settings-content" class="tab-pane" style="display: none;">
-      <h2 class="view-heading">Опции</h2>
-      <div class="options-minimal-list">
-        <div class="option-item">
-          <span>Kill Switch</span>
-          <label class="toggle-warm tma-touch">
-            <input type="checkbox" checked id="opt-kill">
-            <span class="toggle-track"></span>
+      <div class="section-title-wrap">
+        <h2 class="page-title">Параметры соединения</h2>
+      </div>
+
+      <div class="options-table">
+        <div class="option-row">
+          <div>
+            <span class="option-title">Аварийный выключатель (Kill Switch)</span>
+            <span class="option-desc">Блокировать интернет при обрыве туннеля</span>
+          </div>
+          <label class="switch-input tma-touch">
+            <input type="checkbox" checked id="toggle-kill">
+            <span class="switch-slider"></span>
           </label>
         </div>
 
-        <div class="option-item">
-          <span>VLESS XTLS Reality</span>
-          <span class="option-val">Активен</span>
-        </div>
-
-        <div class="option-item">
-          <span>Тактильность Haptic</span>
-          <label class="toggle-warm tma-touch">
-            <input type="checkbox" checked id="opt-haptic">
-            <span class="toggle-track"></span>
+        <div class="option-row">
+          <div>
+            <span class="option-title">Тактильный отклик</span>
+            <span class="option-desc">Вибрация интерфейса в Telegram</span>
+          </div>
+          <label class="switch-input tma-touch">
+            <input type="checkbox" checked id="toggle-haptic">
+            <span class="switch-slider"></span>
           </label>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- FLOATING ISLAND NAV: Pure Warm Orange Minimalist -->
-  <nav class="floating-navbar">
-    <button class="nav-tab-btn active tma-touch" data-tab="connect">
+  <!-- Quiet, Industrial Bottom Nav -->
+  <nav class="dock-navbar">
+    <button class="dock-btn active tma-touch" data-tab="connect">
       <svg><use href="#icon-shield"></use></svg>
-      <span class="nav-tab-label">Сеть</span>
+      <span>Сеть</span>
     </button>
-    <button class="nav-tab-btn tma-touch" data-tab="servers">
+    <button class="dock-btn tma-touch" data-tab="servers">
       <svg><use href="#icon-globe"></use></svg>
-      <span class="nav-tab-label">Серверы</span>
+      <span>Серверы</span>
     </button>
-    <button class="nav-tab-btn tma-touch" data-tab="traffic">
+    <button class="dock-btn tma-touch" data-tab="traffic">
       <svg><use href="#icon-chart"></use></svg>
-      <span class="nav-tab-label">Трафик</span>
+      <span>Трафик</span>
     </button>
-    <button class="nav-tab-btn tma-touch" data-tab="settings">
+    <button class="dock-btn tma-touch" data-tab="settings">
       <svg><use href="#icon-cog"></use></svg>
-      <span class="nav-tab-label">Опции</span>
+      <span>Опции</span>
     </button>
   </nav>
 

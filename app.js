@@ -1,5 +1,5 @@
-// Aether — Minimalist Solar Orange VPN Controller
-// Strictly complies with C:\TMA_Design_Guide\README.md
+// Aether — Industrial Network Instrument Controller
+// Grounded in real utility, honest interaction, and tactile feedback
 
 (function () {
   'use strict';
@@ -12,10 +12,10 @@
       tg.ready();
       tg.expand();
       if (typeof tg.setHeaderColor === 'function') {
-        tg.setHeaderColor('#100d0a');
+        tg.setHeaderColor('#0e0f12');
       }
       if (typeof tg.setBackgroundColor === 'function') {
-        tg.setBackgroundColor('#070708');
+        tg.setBackgroundColor('#08080a');
       }
     } catch (e) {
       console.warn('Telegram WebApp setup error:', e);
@@ -67,32 +67,40 @@
 
     setTimeout(function () {
       toast.classList.remove('show');
-    }, 2200);
+    }, 2000);
   }
 
-  // 5. Power Dial Toggle
+  // 5. Hardware Switch Controller
   let isConnected = true;
   const powerBtn = document.getElementById('power-toggle-btn');
-  const dialCaption = document.getElementById('dial-caption');
-  const heroStateTitle = document.getElementById('hero-state-title');
-  const heroStateSub = document.getElementById('hero-state-sub');
+  const knobText = document.getElementById('knob-text');
+  const consoleTitle = document.getElementById('console-title');
+  const consoleSub = document.getElementById('console-sub');
+  const headerStatus = document.getElementById('header-status');
+  const currentIp = document.getElementById('current-ip');
   const currentPing = document.getElementById('current-ping');
 
-  function updatePowerState() {
+  function updateSwitchState() {
     if (isConnected) {
       powerBtn.classList.remove('disconnected');
       powerBtn.classList.add('active');
-      dialCaption.textContent = 'ON';
-      heroStateTitle.textContent = 'Защищено';
-      heroStateSub.textContent = 'VLESS Reality • Стокгольм, Швеция';
-      currentPing.textContent = '14 ms';
+      knobText.textContent = 'ON';
+      consoleTitle.textContent = 'Защита активна';
+      consoleSub.textContent = 'Трафик направлен через ' + (activeCityName || 'Стокгольм');
+      headerStatus.textContent = 'Подключено';
+      headerStatus.style.color = 'var(--safety-orange)';
+      currentIp.textContent = activeIp || '185.220.101.45';
+      currentPing.textContent = activePingVal || '14';
     } else {
       powerBtn.classList.remove('active');
       powerBtn.classList.add('disconnected');
-      dialCaption.textContent = 'OFF';
-      heroStateTitle.textContent = 'Отключено';
-      heroStateSub.textContent = 'Трафик не зашифрован';
-      currentPing.textContent = '-- ms';
+      knobText.textContent = 'OFF';
+      consoleTitle.textContent = 'Защита отключена';
+      consoleSub.textContent = 'Прямое соединение без шифрования';
+      headerStatus.textContent = 'Отключено';
+      headerStatus.style.color = 'var(--text-muted)';
+      currentIp.textContent = 'Скрыт';
+      currentPing.textContent = '--';
     }
   }
 
@@ -100,17 +108,13 @@
     powerBtn.addEventListener('click', function () {
       Haptic.tap('heavy');
       isConnected = !isConnected;
-      updatePowerState();
-      if (isConnected) {
-        showToast('Туннель активен (14 ms)');
-      } else {
-        showToast('Туннель отключен');
-      }
+      updateSwitchState();
+      showToast(isConnected ? 'Узел подключен' : 'Узел отключен');
     });
   }
 
   // 6. Navigation Tabs
-  const tabButtons = document.querySelectorAll('.nav-tab-btn');
+  const tabButtons = document.querySelectorAll('.dock-btn');
   const tabPanes = document.querySelectorAll('.tab-pane');
 
   function switchTab(targetTabId) {
@@ -140,56 +144,66 @@
     });
   });
 
-  const selectNodeCard = document.getElementById('select-node-card');
-  if (selectNodeCard) {
-    selectNodeCard.addEventListener('click', function () {
+  const activeServerCard = document.getElementById('active-server-card');
+  if (activeServerCard) {
+    activeServerCard.addEventListener('click', function () {
       switchTab('servers');
     });
   }
 
-  // 7. Node Selection in Servers Tab
-  const nodeItems = document.querySelectorAll('.node-item');
+  // 7. Server Selection Table
+  let activeCityName = 'Стокгольм';
+  let activeIp = '185.220.101.45';
+  let activePingVal = '14';
+
+  const serverRows = document.querySelectorAll('.server-row');
   const selectedNodeName = document.getElementById('selected-node-name');
   const selectedNodePing = document.getElementById('selected-node-ping');
 
-  nodeItems.forEach(function (item) {
-    item.addEventListener('click', function () {
+  serverRows.forEach(function (row) {
+    row.addEventListener('click', function () {
       Haptic.tap('medium');
-      nodeItems.forEach(function (i) {
-        i.classList.remove('selected');
+      serverRows.forEach(function (r) {
+        r.classList.remove('selected');
       });
-      item.classList.add('selected');
+      row.classList.add('selected');
 
-      const name = item.getAttribute('data-name');
-      const ping = item.getAttribute('data-ping');
+      const name = row.getAttribute('data-name');
+      const ping = row.getAttribute('data-ping');
+      const ip = row.getAttribute('data-ip');
+
+      activeCityName = name.split(',')[1]?.trim() || name;
+      activeIp = ip;
+      activePingVal = parseInt(ping, 10) || 14;
 
       if (selectedNodeName) selectedNodeName.textContent = name;
       if (selectedNodePing) selectedNodePing.textContent = ping;
-      if (currentPing) currentPing.textContent = ping;
-      if (heroStateSub && isConnected) {
-        heroStateSub.textContent = 'VLESS Reality • ' + name;
+      if (currentPing && isConnected) currentPing.textContent = activePingVal;
+      if (currentIp && isConnected) currentIp.textContent = activeIp;
+      if (consoleSub && isConnected) {
+        consoleSub.textContent = 'Трафик направлен через ' + activeCityName;
       }
 
-      showToast('Узел выбран: ' + name);
+      showToast('Выбран: ' + name);
       switchTab('connect');
     });
   });
 
-  // 8. Copy Config Link
-  const vlessLink = 'vless://aether-solar-node@se.aether.cloud:443?encryption=none&security=reality&sni=se.aether.cloud&fp=chrome&type=grpc#Aether-Solar-10G';
+  // 8. Copy Key CTA
+  const vlessKey = 'vless://aether-ultra-node@se.aether.cloud:443?encryption=none&security=reality&sni=se.aether.cloud&fp=chrome&type=grpc#Aether-Stockholm';
   const copyBtn = document.getElementById('btn-copy-vless');
 
   if (copyBtn) {
     copyBtn.addEventListener('click', function () {
       Haptic.tap('medium');
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(vlessLink).then(function () {
-          showToast('VLESS ключ скопирован для Happ');
+        navigator.clipboard.writeText(vlessKey).then(function () {
+          showToast('Ключ VLESS скопирован');
         }).catch(function () {
-          showToast('VLESS ключ скопирован');
+          showToast('Ключ скопирован');
         });
       } else {
-        showToast('VLESS ключ скопирован');
+        showToast('Ключ скопирован');
       }
     });
   }
@@ -199,10 +213,11 @@
   if (pingBtn) {
     pingBtn.addEventListener('click', function () {
       Haptic.tap('light');
-      const p = Math.floor(Math.random() * 4) + 12;
-      currentPing.textContent = p + ' ms';
-      if (selectedNodePing) selectedNodePing.textContent = p + ' ms';
-      showToast('Пинг: ' + p + ' ms');
+      const p = Math.floor(Math.random() * 3) + 13;
+      activePingVal = p;
+      if (isConnected) currentPing.textContent = p;
+      if (selectedNodePing) selectedNodePing.textContent = p + ' мс';
+      showToast('Пинг: ' + p + ' мс');
     });
   }
 
