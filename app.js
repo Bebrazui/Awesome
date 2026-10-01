@@ -1,321 +1,263 @@
-// Telegram WebApp Design Guide Implementation
-const tg = window.Telegram?.WebApp;
+// GhostNet — Stealth Mesh VPN & Proxy Hub JavaScript Controller
+// Strictly complies with C:\TMA_Design_Guide\README.md (Sections 4, 7, 9)
 
-// Haptic feedback engine (Section 9 of Style Guide)
-const Haptic = {
-  tabChange: () => {
-    try { tg?.HapticFeedback?.selectionChanged(); } catch (e) {}
-  },
-  tap: (style = 'light') => {
-    try { tg?.HapticFeedback?.impactOccurred(style); } catch (e) {}
-  },
-  success: () => {
-    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
-  },
-  error: () => {
-    try { tg?.HapticFeedback?.notificationOccurred('error'); } catch (e) {}
-  }
-};
+(function () {
+  'use strict';
 
-// Toast notification helper
-function showToast(text) {
-  const toast = document.getElementById('toast');
-  const toastText = document.getElementById('toast-text');
-  if (!toast || !toastText) return;
-  toastText.textContent = text;
-  toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 2200);
-}
+  // 1. Telegram WebApp Integration
+  const tg = window.Telegram?.WebApp;
 
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Initialize Telegram WebApp environment (Section 4.1)
   if (tg) {
     try {
       tg.ready();
       tg.expand();
-      tg.setHeaderColor('#101924');
-      tg.setBackgroundColor('#0d131a');
-
-      // Personalize user details and avatar (from Telegram WebApp initDataUnsafe)
-      const user = tg.initDataUnsafe?.user;
-      if (user) {
-        if (user.first_name) {
-          const greetingEl = document.getElementById('user-greeting');
-          if (greetingEl) {
-            greetingEl.textContent = `Кошелек ${user.first_name}`;
-          }
-          const profileName = document.getElementById('profile-name');
-          if (profileName) {
-            profileName.textContent = user.last_name ? `${user.first_name} ${user.last_name}` : user.first_name;
-          }
-        }
-        if (user.username) {
-          const profileHandle = document.getElementById('profile-handle');
-          if (profileHandle) {
-            profileHandle.textContent = `@${user.username}`;
-          }
-        }
-        if (user.photo_url) {
-          const heroAvatarImg = document.getElementById('user-avatar-img');
-          const heroPlaceholder = document.getElementById('user-avatar-placeholder');
-          if (heroAvatarImg && heroPlaceholder) {
-            heroAvatarImg.src = user.photo_url;
-            heroAvatarImg.style.display = 'block';
-            heroPlaceholder.style.display = 'none';
-          }
-          const profileAvatarImg = document.getElementById('profile-avatar-img');
-          const profilePlaceholder = document.getElementById('profile-avatar-placeholder');
-          if (profileAvatarImg && profilePlaceholder) {
-            profileAvatarImg.src = user.photo_url;
-            profileAvatarImg.style.display = 'block';
-            profilePlaceholder.style.display = 'none';
-          }
-        }
+      if (typeof tg.setHeaderColor === 'function') {
+        tg.setHeaderColor('#0b1424');
+      }
+      if (typeof tg.setBackgroundColor === 'function') {
+        tg.setBackgroundColor('#06090f');
       }
     } catch (e) {
-      console.warn('Telegram WebApp SDK init error:', e);
+      console.warn('Telegram WebApp setup error:', e);
     }
   }
 
-  // 2. Floating Navbar Tab Switching (Section 7)
-  const tabButtons = document.querySelectorAll('.nav-tab-btn');
-  const tabPanes = {
-    agent: document.getElementById('tab-agent-content'),
-    explore: document.getElementById('tab-explore-content'),
-    generate: document.getElementById('tab-generate-content'),
-    settings: document.getElementById('tab-settings-content')
+  // 2. Haptic Feedback Utility (Section 9)
+  const Haptic = {
+    tap: function (style) {
+      try {
+        tg?.HapticFeedback?.impactOccurred(style || 'light');
+      } catch (e) {}
+    },
+    success: function () {
+      try {
+        tg?.HapticFeedback?.notificationOccurred('success');
+      } catch (e) {}
+    },
+    tabChange: function () {
+      try {
+        tg?.HapticFeedback?.selectionChanged();
+      } catch (e) {}
+    }
   };
 
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tabId = btn.getAttribute('data-tab');
-      if (!tabPanes[tabId]) return;
+  // 3. User Avatar and Name Synchronization
+  function syncUserProfile() {
+    const user = tg?.initDataUnsafe?.user;
+    const nameEl = document.getElementById('user-display-name');
+    const avatarEl = document.getElementById('nav-user-avatar');
 
-      Haptic.tabChange();
+    if (user && user.first_name) {
+      if (nameEl) nameEl.textContent = user.first_name;
+    }
 
-      // Update active state on tab buttons
-      tabButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      // Update active tab pane
-      Object.keys(tabPanes).forEach(id => {
-        if (id === tabId) {
-          tabPanes[id].style.display = 'block';
-          tabPanes[id].classList.add('active');
-        } else {
-          tabPanes[id].style.display = 'none';
-          tabPanes[id].classList.remove('active');
-        }
-      });
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  });
-
-  // 3. Action Prompt Cards Interaction (Section 5)
-  document.querySelectorAll('.action-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      e.preventDefault();
-      Haptic.tap('medium');
-      const actionName = card.querySelector('.card-title')?.textContent || 'Действие';
-      showToast(`Запущено: ${actionName}`);
-    });
-  });
-
-  // 4. Model Selector Modal Bottom Sheet (Section 4.2)
-  const modelBtn = document.getElementById('model-selector-btn');
-  const modelModal = document.getElementById('model-modal');
-  const modelNameLabel = document.getElementById('selected-model-name');
-  const modelOptions = document.querySelectorAll('.sheet-option');
-
-  if (modelBtn && modelModal) {
-    modelBtn.addEventListener('click', () => {
-      Haptic.tap('light');
-      modelModal.classList.add('active');
-    });
-
-    modelModal.addEventListener('click', (e) => {
-      if (e.target === modelModal || e.target.classList.contains('sheet-handle')) {
-        modelModal.classList.remove('active');
-      }
-    });
-
-    modelOptions.forEach(opt => {
-      opt.addEventListener('click', () => {
-        const model = opt.getAttribute('data-model');
-        modelOptions.forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        if (modelNameLabel) {
-          modelNameLabel.textContent = model;
-        }
-        Haptic.success();
-        modelModal.classList.remove('active');
-        showToast(`Выбрана модель: ${model}`);
-      });
-    });
+    if (user && user.photo_url) {
+      if (avatarEl) avatarEl.src = user.photo_url;
+    }
   }
 
-  // 5. Deposit TON Button
-  const proBtn = document.getElementById('pro-btn');
-  if (proBtn) {
-    proBtn.addEventListener('click', () => {
+  // 4. Toast Notification
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    if (!toast || !toastText) return;
+
+    toastText.textContent = msg;
+    toast.classList.add('show');
+    Haptic.success();
+
+    setTimeout(function () {
+      toast.classList.remove('show');
+    }, 2400);
+  }
+
+  // 5. Power Toggle State (Connected / Disconnected)
+  let isConnected = true;
+  const powerBtn = document.getElementById('power-toggle-btn');
+  const statusLabel = document.getElementById('status-label-text');
+  const statusIp = document.getElementById('status-ip-text');
+  const metricSpeed = document.getElementById('metric-speed');
+  const metricPingVal = document.getElementById('metric-ping-val');
+  const currentPing = document.getElementById('current-ping');
+
+  function updatePowerState() {
+    if (isConnected) {
+      powerBtn.classList.remove('disconnected');
+      powerBtn.classList.add('active');
+      statusLabel.innerHTML = '<span class="status-dot-active"></span><span>ЗАЩИЩЕНО • VLESS REALITY</span>';
+      statusLabel.style.color = '#22c55e';
+      statusIp.textContent = '185.220.101.45 • Стокгольм, Швеция';
+      metricSpeed.textContent = '980';
+      metricPingVal.textContent = '14';
+      currentPing.textContent = '14 ms';
+    } else {
+      powerBtn.classList.remove('active');
+      powerBtn.classList.add('disconnected');
+      statusLabel.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;"></span><span>ОТКЛЮЧЕНО</span>';
+      statusLabel.style.color = '#ef4444';
+      statusIp.textContent = 'Трафик не защищен • Нажмите для подключения';
+      metricSpeed.textContent = '0';
+      metricPingVal.textContent = '--';
+      currentPing.textContent = '-- ms';
+    }
+  }
+
+  if (powerBtn) {
+    powerBtn.addEventListener('click', function () {
       Haptic.tap('heavy');
-      showToast('💎 Адрес пополнения скопирован в буфер!');
-    });
-  }
-
-  // 6. Arc Progress Widget (Section 8.1)
-  const continueSetupBtn = document.getElementById('btn-continue-setup');
-  const arcStepsLeft = document.getElementById('arc-steps-left');
-  let currentSteps = 3;
-
-  if (continueSetupBtn && arcStepsLeft) {
-    continueSetupBtn.addEventListener('click', () => {
-      if (currentSteps > 1) {
-        currentSteps -= 1;
-        arcStepsLeft.textContent = currentSteps;
-        Haptic.success();
-        showToast(`Шаг верификации пройден! Осталось: ${currentSteps}`);
+      isConnected = !isConnected;
+      updatePowerState();
+      if (isConnected) {
+        showToast('Подключено к Стокгольм (14 ms)');
       } else {
-        arcStepsLeft.textContent = '✓';
-        continueSetupBtn.textContent = 'Лимит $50,000 активен';
-        continueSetupBtn.style.background = '#28c76f';
-        Haptic.success();
-        showToast('Максимальный лимит верификации получен!');
+        showToast('Защита отключена');
       }
     });
   }
 
-  // 7. Quick Action Items
-  document.querySelectorAll('.quick-action-item').forEach(item => {
-    item.addEventListener('click', () => {
-      Haptic.tap('light');
-      const label = item.querySelector('.quick-action-label')?.textContent || '';
-      showToast(`Операция: ${label}`);
+  // 6. Node Selection Logic
+  const nodeRows = document.querySelectorAll('.node-row');
+  nodeRows.forEach(function (row) {
+    row.addEventListener('click', function () {
+      Haptic.tap('medium');
+      nodeRows.forEach(function (r) {
+        r.classList.remove('selected');
+        const radio = r.querySelector('.node-radio-active, .node-radio');
+        if (radio) {
+          radio.className = 'node-radio';
+        }
+      });
+      row.classList.add('selected');
+      const radio = row.querySelector('.node-radio');
+      if (radio) {
+        radio.className = 'node-radio-active';
+      }
+
+      const nodeName = row.querySelector('.node-title')?.textContent || 'Сервер';
+      const nodePing = row.querySelector('.node-ping-tag')?.textContent || '14 ms';
+      
+      if (statusIp) {
+        statusIp.textContent = '185.220.101.45 • ' + nodeName;
+      }
+      if (currentPing) {
+        currentPing.textContent = nodePing;
+      }
+      if (metricPingVal) {
+        metricPingVal.textContent = parseInt(nodePing, 10) || 14;
+      }
+
+      showToast('Выбран узел: ' + nodeName);
     });
   });
 
-  // 8. Promo Banner Close & Carousel Dots
-  const promoClose = document.getElementById('promo-close-btn');
-  const promoBanner = document.getElementById('promo-banner-card');
-  if (promoClose && promoBanner) {
-    promoClose.addEventListener('click', (e) => {
-      e.stopPropagation();
-      Haptic.tap('light');
-      promoBanner.style.display = 'none';
-    });
-  }
+  // 7. Clipboard Copy Logic
+  const vlessConfig = 'vless://ghostnet-ultra-node@se.ghostnet.cloud:443?encryption=none&security=reality&sni=se.ghostnet.cloud&fp=chrome&type=grpc#GhostNet-Sweden-10G';
 
-  // 9. DEX Swap Logic
-  const swapBtn = document.getElementById('generate-btn');
-  const swapInput = document.getElementById('swap-input-amount');
-  const swapOutput = document.getElementById('swap-output-amount');
-  const swapBtnLabel = document.getElementById('swap-btn-label');
-  const outputBox = document.getElementById('generation-output');
-  const outputText = document.getElementById('output-text');
-  const quickPairPills = document.querySelectorAll('.quick-prompt-pill');
-  const swapReverseBtn = document.getElementById('swap-reverse-btn');
-  const fromSymbolEl = document.getElementById('swap-from-symbol');
-  const toSymbolEl = document.getElementById('swap-to-symbol');
-
-  let currentRate = 5.62;
-  let fromSymbol = 'TON';
-  let toSymbol = 'USDT';
-
-  function updateSwapCalculation() {
-    const val = parseFloat(swapInput?.value || '0');
-    if (swapOutput) {
-      swapOutput.textContent = (val * currentRate).toFixed(2);
+  function copyToClipboard(text, msg) {
+    Haptic.tap('medium');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast(msg || 'Скопировано в буфер!');
+      }).catch(function () {
+        showToast(msg || 'Скопировано!');
+      });
+    } else {
+      showToast(msg || 'Скопировано!');
     }
-    if (swapBtnLabel) {
-      swapBtnLabel.textContent = `Обменять ${fromSymbol} на ${toSymbol}`;
-    }
   }
 
-  if (swapInput) {
-    swapInput.addEventListener('input', updateSwapCalculation);
+  const copyVlessBtn = document.getElementById('btn-copy-vless');
+  if (copyVlessBtn) {
+    copyVlessBtn.addEventListener('click', function () {
+      copyToClipboard(vlessConfig, 'Ключ VLESS скопирован для Happ');
+    });
   }
 
-  quickPairPills.forEach(pill => {
-    pill.addEventListener('click', () => {
+  // 8. QR Code Modal
+  const qrModal = document.getElementById('qr-modal');
+  const showQrBtn = document.getElementById('btn-show-qr');
+  const closeQrBtn = document.getElementById('close-qr-btn');
+  const copyInsideModalBtn = document.getElementById('copy-link-inside-modal');
+
+  if (showQrBtn && qrModal) {
+    showQrBtn.addEventListener('click', function () {
+      Haptic.tap('medium');
+      qrModal.classList.add('open');
+    });
+  }
+
+  if (closeQrBtn && qrModal) {
+    closeQrBtn.addEventListener('click', function () {
       Haptic.tap('light');
-      const pair = pill.getAttribute('data-pair');
-      if (pair === 'TON_USDT') {
-        fromSymbol = 'TON'; toSymbol = 'USDT'; currentRate = 5.62;
-      } else if (pair === 'USDT_TON') {
-        fromSymbol = 'USDT'; toSymbol = 'TON'; currentRate = 0.178;
-      } else if (pair === 'TON_NOT') {
-        fromSymbol = 'TON'; toSymbol = 'NOT'; currentRate = 720.5;
-      } else if (pair === 'TON_STARS') {
-        fromSymbol = 'TON'; toSymbol = 'Stars'; currentRate = 350.0;
+      qrModal.classList.remove('open');
+    });
+  }
+
+  if (qrModal) {
+    qrModal.addEventListener('click', function (e) {
+      if (e.target === qrModal) {
+        qrModal.classList.remove('open');
       }
-      if (fromSymbolEl) fromSymbolEl.textContent = fromSymbol;
-      if (toSymbolEl) toSymbolEl.textContent = toSymbol;
-      updateSwapCalculation();
+    });
+  }
+
+  if (copyInsideModalBtn) {
+    copyInsideModalBtn.addEventListener('click', function () {
+      copyToClipboard(vlessConfig, 'Строка подключения скопирована');
+      qrModal?.classList.remove('open');
+    });
+  }
+
+  // 9. Floating Island Tab Navigation (Section 7)
+  const tabButtons = document.querySelectorAll('.nav-tab-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+
+  function switchTab(targetTabId) {
+    Haptic.tabChange();
+
+    tabButtons.forEach(function (btn) {
+      if (btn.getAttribute('data-tab') === targetTabId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    tabPanes.forEach(function (pane) {
+      if (pane.id === 'tab-' + targetTabId + '-content') {
+        pane.style.display = 'block';
+      } else {
+        pane.style.display = 'none';
+      }
+    });
+  }
+
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const tabId = btn.getAttribute('data-tab');
+      switchTab(tabId);
     });
   });
 
-  if (swapReverseBtn) {
-    swapReverseBtn.addEventListener('click', () => {
-      Haptic.tap('medium');
-      const temp = fromSymbol;
-      fromSymbol = toSymbol;
-      toSymbol = temp;
-      currentRate = 1 / currentRate;
-      if (fromSymbolEl) fromSymbolEl.textContent = fromSymbol;
-      if (toSymbolEl) toSymbolEl.textContent = toSymbol;
-      updateSwapCalculation();
+  const viewAllNodesBtn = document.getElementById('view-all-nodes-btn');
+  if (viewAllNodesBtn) {
+    viewAllNodesBtn.addEventListener('click', function () {
+      switchTab('servers');
     });
   }
 
-  if (swapBtn && outputBox && outputText) {
-    swapBtn.addEventListener('click', () => {
-      const val = parseFloat(swapInput?.value || '0');
-      if (val <= 0) {
-        Haptic.error();
-        showToast('Укажите сумму для обмена');
-        return;
-      }
-
-      Haptic.tap('medium');
-      swapBtn.disabled = true;
-      swapBtn.style.opacity = '0.6';
-      if (swapBtnLabel) swapBtnLabel.textContent = 'Маршрутизация DEX...';
-
-      outputBox.style.display = 'block';
-      outputBox.classList.add('visible');
-      outputText.innerHTML = '<span style="color: var(--text-secondary);">Поиск лучшего пула ликвидности DeDust / STON.fi...</span>';
-
-      setTimeout(() => {
-        Haptic.success();
-        swapBtn.disabled = false;
-        swapBtn.style.opacity = '1';
-        if (swapBtnLabel) swapBtnLabel.textContent = `Обменять ${fromSymbol} на ${toSymbol}`;
-
-        const received = (val * currentRate).toFixed(2);
-        const txHash = '0x' + Math.random().toString(16).substring(2, 10) + '...' + Math.random().toString(16).substring(2, 6);
-        outputText.innerHTML = `✅ <b>Успешно обменяно:</b> ${val} ${fromSymbol} → <b>${received} ${toSymbol}</b><br><span style="color: var(--text-secondary); font-size: 11px;">TX Hash: ${txHash} • Сетевой сбор: 0.00 TON (Gasless)</span>`;
-        showToast(`Обмен завершен: +${received} ${toSymbol}!`);
-      }, 600);
-    });
-  }
-
-  // 10. Settings toggles and items
-  const digestToggle = document.getElementById('digest-toggle');
-  if (digestToggle) {
-    digestToggle.addEventListener('change', () => {
-      Haptic.tap('medium');
-      showToast(digestToggle.checked ? 'Дайджест включен (09:00)' : 'Дайджест отключен');
-    });
-  }
-
-  document.querySelectorAll('.group-item[data-setting]').forEach(item => {
-    item.addEventListener('click', () => {
+  // 10. Ping refresh button
+  const pingRefreshBtn = document.getElementById('ping-refresh-btn');
+  if (pingRefreshBtn) {
+    pingRefreshBtn.addEventListener('click', function () {
       Haptic.tap('light');
-      const title = item.querySelector('.group-item-title')?.textContent || '';
-      showToast(`Настройка: ${title}`);
+      const p = Math.floor(Math.random() * 5) + 12;
+      currentPing.textContent = p + ' ms';
+      metricPingVal.textContent = p;
+      showToast('Пинг обновлен: ' + p + ' ms');
     });
-  });
-});
+  }
+
+  // 11. Initial execution
+  syncUserProfile();
+})();
